@@ -13,6 +13,8 @@ struct Card: Identifiable, Codable, Hashable {
     var firstReviewed: Date?
     /// Stable identity for cards that come from a synced deck, used to keep progress across syncs.
     var sourceKey: String?
+    /// Review progress for studying back-to-front, kept apart because recalling the word is harder.
+    var reverse: ReviewState?
 
     var isNew: Bool { reps == 0 && lapses == 0 }
     func isDue(at date: Date) -> Bool { due <= date }
@@ -32,6 +34,53 @@ extension Card {
         created = try c.decodeIfPresent(Date.self, forKey: .created) ?? .now
         firstReviewed = try c.decodeIfPresent(Date.self, forKey: .firstReviewed)
         sourceKey = try c.decodeIfPresent(String.self, forKey: .sourceKey)
+        reverse = try c.decodeIfPresent(ReviewState.self, forKey: .reverse)
+    }
+
+    /// This card with its reverse progress swapped into the scheduling fields, so the Scheduler and
+    /// due queries work unchanged for back-to-front study. The text stays as is.
+    func flipped() -> Card {
+        let r = reverse ?? ReviewState()
+        var card = self
+        card.ease = r.ease
+        card.intervalDays = r.intervalDays
+        card.reps = r.reps
+        card.lapses = r.lapses
+        card.due = r.due
+        card.firstReviewed = r.firstReviewed
+        return card
+    }
+}
+
+struct ReviewState: Codable, Hashable {
+    var ease = 2.5
+    var intervalDays: Double = 0
+    var reps = 0
+    var lapses = 0
+    var due = Date.distantPast
+    var firstReviewed: Date?
+
+    init() {}
+
+    init(_ card: Card) {
+        ease = card.ease
+        intervalDays = card.intervalDays
+        reps = card.reps
+        lapses = card.lapses
+        due = card.due
+        firstReviewed = card.firstReviewed
+    }
+}
+
+enum StudyDirection: String, CaseIterable, Identifiable {
+    case forward, reverse
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .forward: "Word → Meaning"
+        case .reverse: "Meaning → Word"
+        }
     }
 }
 

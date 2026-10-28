@@ -122,3 +122,27 @@ struct FeedLanguageTests {
         #expect(cards[1].back == "nur Deutsch")
     }
 }
+
+struct ReverseTests {
+    @Test func reverseProgressIsSeparate() {
+        var card = Scheduler.review(Card(front: "a", back: "b"), rating: .good)
+        #expect(card.flipped().isNew)
+        #expect(card.flipped().isDue(at: .now))
+
+        card.reverse = ReviewState(Scheduler.review(card.flipped(), rating: .easy))
+        #expect(card.flipped().reps == 1)
+        #expect(card.flipped().ease > card.ease)
+        #expect(card.reps == 1 && card.ease == 2.5) // forward progress untouched
+    }
+
+    @Test func reverseSurvivesSaveAndSync() throws {
+        var card = Card(front: "a", back: "b", sourceKey: "a")
+        card.reverse = ReviewState(Scheduler.review(card.flipped(), rating: .good))
+        let data = try JSONEncoder().encode(card)
+        let decoded = try JSONDecoder().decode(Card.self, from: data)
+        #expect(decoded.reverse == card.reverse)
+
+        let merged = Deck(name: "d", cards: [decoded]).merging([Card(front: "a", back: "new", sourceKey: "a")])
+        #expect(merged.cards[0].reverse?.reps == 1)
+    }
+}

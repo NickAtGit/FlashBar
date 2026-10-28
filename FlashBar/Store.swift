@@ -19,6 +19,10 @@ final class Store {
             reapplyCachedFeeds()
         }
     }
+    /// Which side is asked. Reverse cards have their own progress (`Card.reverse`).
+    var direction = StudyDirection(rawValue: UserDefaults.standard.string(forKey: "studyDirection") ?? "") ?? .forward {
+        didSet { UserDefaults.standard.set(direction.rawValue, forKey: "studyDirection") }
+    }
     /// Ticks every 30s so due counts update while the app idles in the menu bar.
     private(set) var now = Date.now
     private(set) var isSyncing = false
@@ -134,7 +138,7 @@ final class Store {
 
     /// Due reviews first, then today's remaining allowance of new cards (newest first).
     func dueCards(in decks: [Deck]) -> [Card] {
-        let cards = decks.flatMap(\.cards)
+        let cards = studyCards(in: decks)
         let reviews = cards.filter { !$0.isNew && $0.isDue(at: now) }.sorted { $0.due < $1.due }
         let introducedToday = cards.count { $0.firstReviewed.map(Calendar.current.isDateInToday) ?? false }
         let allowance = max(0, newCardsPerDay - introducedToday)
@@ -146,10 +150,10 @@ final class Store {
 
     /// Unseen cards are waiting but today's new-card allowance is used up.
     var newCardsWaitingForTomorrow: Bool {
-        studyDecks.contains { $0.cards.contains(where: \.isNew) } && !dueCards(in: studyDecks).contains(where: \.isNew)
+        studyCards(in: studyDecks).contains(where: \.isNew) && !dueCards(in: studyDecks).contains(where: \.isNew)
     }
 
-    var nextDue: Date? { studyDecks.flatMap(\.cards).map(\.due).filter { $0 > now }.min() }
+    var nextDue: Date? { studyCards(in: studyDecks).map(\.due).filter { $0 > now }.min() }
 
     /// Synced vocab is European Portuguese; other decks let the speaker guess from the text.
     func speechLanguage(for cardID: UUID) -> String? {
@@ -160,6 +164,16 @@ final class Store {
         decks.first { $0.cards.contains { $0.id == cardID } }?.isSynced ?? false
     }
 
+    /// The cards as seen in the current direction: in reverse, scheduling fields hold the reverse progress.
+    func studyCards(in decks: [Deck]) -> [Card] {
+        let cards = decks.flatMap(\.cards)
+        return direction == .reverse ? cards.map { $0.flipped() } : cards
+    }
+
+    func studyCard(_ id: UUID) -> Card? {
+        card(id).map { direction == .reverse ? $0.flipped() : $0 }
+    }
+
     func card(_ id: UUID) -> Card? {
         for deck in decks { if let c = deck.cards.first(where: { $0.id == id }) { return c } }
         return nil
@@ -168,10 +182,15 @@ final class Store {
     // MARK: Mutations
 
     func review(_ cardID: UUID, rating: Rating) {
+        let reverse = direction == .reverse
         update(cardID) { card in
-            var next = Scheduler.review(card, rating: rating)
-            next.firstReviewed = card.firstReviewed ?? .now
-            return next
+            let seen = reverse ? card.flipped() : card
+            var next = Scheduler.review(seen, rating: rating)
+            next.firstReviewed = seen.firstReviewed ?? .now
+            guard reverse else { return next }
+            var updated = card
+            updated.reverse = ReviewState(next)
+            return updated
         }
         now = .now
     }

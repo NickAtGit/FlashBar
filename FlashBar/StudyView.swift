@@ -10,7 +10,8 @@ struct StudyView: View {
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     private var speaker: Speaker { .shared }
 
-    private var current: Card? { queue.first.flatMap(store.card) }
+    private var current: Card? { queue.first.flatMap(store.studyCard) }
+    private var reversed: Bool { store.direction == .reverse }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -26,6 +27,7 @@ struct StudyView: View {
         .frame(width: 360)
         .onAppear(perform: refillIfEmpty)
         .onChange(of: store.studyDeckID) { rebuildQueue() }
+        .onChange(of: store.direction) { rebuildQueue() }
         .onChange(of: queue.first, initial: true) { autoSpeak() }
         .onDisappear { speaker.stop() }
     }
@@ -57,6 +59,10 @@ struct StudyView: View {
                                                                set: { store.newCardsPerDay = $0 })) {
                     ForEach([0, 10, 20, 30, 50, 100], id: \.self) { Text("\($0)").tag($0) }
                 }
+                Picker("Card Direction", selection: Binding(get: { store.direction },
+                                                            set: { store.direction = $0 })) {
+                    ForEach(StudyDirection.allCases) { Text($0.title).tag($0) }
+                }
                 Picker("Translations", selection: Binding(get: { store.feedLanguage },
                                                           set: { store.feedLanguage = $0 })) {
                     ForEach(FeedLanguage.allCases) { Text($0.title).tag($0) }
@@ -83,13 +89,12 @@ struct StudyView: View {
 
     private func cardFace(_ card: Card) -> some View {
         VStack(spacing: 14) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(card.front)
+            if reversed {
+                Text(meaning(card))
                     .font(.title2.weight(.semibold))
                     .fixedSize(horizontal: false, vertical: true)
-                speakButton(card.front, language: store.speechLanguage(for: card.id))
-                    .keyboardShortcut("s", modifiers: [])
-                    .help("Listen (S)")
+            } else {
+                word(card, font: .title2.weight(.semibold))
             }
             if revealed {
                 Divider()
@@ -111,7 +116,24 @@ struct StudyView: View {
         .onTapGesture { reveal() }
     }
 
-    /// The meaning, then any example (everything after the first blank line) in a quieter style.
+    /// The front with its listen button (S).
+    private func word(_ card: Card, font: Font) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(card.front)
+                .font(font)
+                .fixedSize(horizontal: false, vertical: true)
+            speakButton(card.front, language: store.speechLanguage(for: card.id))
+                .keyboardShortcut("s", modifiers: [])
+                .help("Listen (S)")
+        }
+    }
+
+    /// The back up to the first blank line; the rest is the example.
+    private func meaning(_ card: Card) -> String {
+        card.back.components(separatedBy: "\n\n")[0]
+    }
+
+    /// The meaning (or the word, when studying in reverse), then any example in a quieter style.
     /// In synced vocab the example's first line is Portuguese, so it gets its own listen button.
     private func answer(_ card: Card) -> some View {
         let parts = card.back.components(separatedBy: "\n\n")
@@ -119,9 +141,13 @@ struct StudyView: View {
         let spokenExample = store.isSynced(card.id) ? exampleLines.first.flatMap { $0.isEmpty ? nil : $0 } : nil
         let rest = (spokenExample == nil ? exampleLines : Array(exampleLines.dropFirst())).joined(separator: "\n")
         return VStack(spacing: 10) {
-            Text(parts[0])
-                .font(.title3)
-                .fixedSize(horizontal: false, vertical: true)
+            if reversed {
+                word(card, font: .title3.weight(.semibold))
+            } else {
+                Text(parts[0])
+                    .font(.title3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             VStack(spacing: 2) {
                 if let spokenExample {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -215,11 +241,16 @@ struct StudyView: View {
     // MARK: Actions
 
     private func reveal() {
+        guard !revealed else { return }
         withAnimation(.snappy(duration: 0.2)) { revealed = true }
+        // In reverse the word is the answer, so it's read on reveal rather than when the card appears.
+        if reversed, speaker.autoSpeak, let card = current {
+            speaker.speak(card.front, language: store.speechLanguage(for: card.id))
+        }
     }
 
     private func autoSpeak() {
-        guard speaker.autoSpeak, let card = current else { return }
+        guard speaker.autoSpeak, !reversed, let card = current else { return }
         speaker.speak(card.front, language: store.speechLanguage(for: card.id))
     }
 
