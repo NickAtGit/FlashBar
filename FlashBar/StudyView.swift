@@ -50,12 +50,9 @@ struct StudyView: View {
 
             Spacer()
 
-            if practicing {
-                Text("Practice").font(.callout.weight(.medium)).foregroundStyle(.purple)
-            }
-
             Text(queue.isEmpty ? "" : "\(queue.count) left")
                 .font(.callout.monospacedDigit())
+                .fixedSize()
                 .foregroundStyle(.secondary)
 
             Menu {
@@ -119,6 +116,11 @@ struct StudyView: View {
         .frame(maxWidth: .infinity, minHeight: 150)
         .padding(16)
         .background(.background.secondary, in: .rect(cornerRadius: 12))
+        .overlay(alignment: .topLeading) {
+            if practicing {
+                Text("PRACTICE").font(.caption2.bold()).foregroundStyle(.purple).padding(8)
+            }
+        }
         .overlay(alignment: .topTrailing) {
             if card.isNew {
                 Text("NEW").font(.caption2.bold()).foregroundStyle(.blue).padding(8)
