@@ -11,6 +11,7 @@ struct Card: Identifiable, Codable, Hashable {
     var due = Date.distantPast
     var created = Date.now
     var firstReviewed: Date?
+    var lastReviewed: Date?
     /// Stable identity for cards that come from a synced deck, used to keep progress across syncs.
     var sourceKey: String?
     /// Review progress for studying back-to-front, kept apart because recalling the word is harder.
@@ -18,6 +19,15 @@ struct Card: Identifiable, Codable, Hashable {
 
     var isNew: Bool { reps == 0 && lapses == 0 }
     func isDue(at date: Date) -> Bool { due <= date }
+
+    func wasReviewed(onDayOf date: Date, calendar: Calendar = .current) -> Bool {
+        if let lastReviewed { return calendar.isDate(lastReviewed, inSameDayAs: date) }
+        // Cards reviewed before `lastReviewed` existed: a passing review sets the due date
+        // exactly `intervalDays` after the start of the review day.
+        guard reps > 0 else { return false }
+        let today = calendar.startOfDay(for: date)
+        return calendar.date(byAdding: .day, value: Int(intervalDays), to: today) == due
+    }
 }
 
 extension Card {
@@ -33,6 +43,7 @@ extension Card {
         due = try c.decodeIfPresent(Date.self, forKey: .due) ?? .distantPast
         created = try c.decodeIfPresent(Date.self, forKey: .created) ?? .now
         firstReviewed = try c.decodeIfPresent(Date.self, forKey: .firstReviewed)
+        lastReviewed = try c.decodeIfPresent(Date.self, forKey: .lastReviewed)
         sourceKey = try c.decodeIfPresent(String.self, forKey: .sourceKey)
         reverse = try c.decodeIfPresent(ReviewState.self, forKey: .reverse)
     }
@@ -48,6 +59,7 @@ extension Card {
         card.lapses = r.lapses
         card.due = r.due
         card.firstReviewed = r.firstReviewed
+        card.lastReviewed = r.lastReviewed
         return card
     }
 }
@@ -59,6 +71,7 @@ struct ReviewState: Codable, Hashable {
     var lapses = 0
     var due = Date.distantPast
     var firstReviewed: Date?
+    var lastReviewed: Date?
 
     init() {}
 
@@ -69,6 +82,7 @@ struct ReviewState: Codable, Hashable {
         lapses = card.lapses
         due = card.due
         firstReviewed = card.firstReviewed
+        lastReviewed = card.lastReviewed
     }
 }
 

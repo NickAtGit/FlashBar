@@ -146,6 +146,13 @@ final class Store {
         return reviews + new
     }
 
+    /// Cards already studied today in the current direction, in the order they were reviewed.
+    func reviewedToday(in decks: [Deck]) -> [Card] {
+        studyCards(in: decks)
+            .filter { $0.wasReviewed(onDayOf: now) }
+            .sorted { ($0.lastReviewed ?? .distantPast) < ($1.lastReviewed ?? .distantPast) }
+    }
+
     var dueCount: Int { dueCards(in: studyDecks).count }
 
     /// Unseen cards are waiting but today's new-card allowance is used up.
@@ -187,6 +194,7 @@ final class Store {
             let seen = reverse ? card.flipped() : card
             var next = Scheduler.review(seen, rating: rating)
             next.firstReviewed = seen.firstReviewed ?? .now
+            next.lastReviewed = .now
             guard reverse else { return next }
             var updated = card
             updated.reverse = ReviewState(next)

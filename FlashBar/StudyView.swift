@@ -7,6 +7,8 @@ struct StudyView: View {
     @State private var queue: [UUID] = []
     @State private var revealed = false
     @State private var reviewedThisSession = 0
+    /// Re-studying today's cards: ratings don't touch the schedule, "Again" just requeues.
+    @State private var practicing = false
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     private var speaker: Speaker { .shared }
 
@@ -48,6 +50,10 @@ struct StudyView: View {
 
             Spacer()
 
+            if practicing {
+                Text("Practice").font(.callout.weight(.medium)).foregroundStyle(.purple)
+            }
+
             Text(queue.isEmpty ? "" : "\(queue.count) left")
                 .font(.callout.monospacedDigit())
                 .foregroundStyle(.secondary)
@@ -55,6 +61,12 @@ struct StudyView: View {
             Menu {
                 Button("Manage Decks…") { openManager() }
                     .keyboardShortcut(",")
+                Button("Practice Today's Cards Again") { startPractice() }
+                    .disabled(store.reviewedToday(in: store.studyDecks).isEmpty)
+                if practicing {
+                    Button("Stop Practicing") { rebuildQueue() }
+                }
+                Divider()
                 Picker("New Cards per Day", selection: Binding(get: { store.newCardsPerDay },
                                                                set: { store.newCardsPerDay = $0 })) {
                     ForEach([0, 10, 20, 30, 50, 100], id: \.self) { Text("\($0)").tag($0) }
@@ -182,7 +194,20 @@ struct StudyView: View {
 
     @ViewBuilder
     private func controls(_ card: Card) -> some View {
-        if revealed {
+        if revealed && practicing {
+            HStack(spacing: 6) {
+                Button { practice(gotIt: false) } label: { Text("Again").frame(maxWidth: .infinity) }
+                    .tint(.red)
+                    .keyboardShortcut("1", modifiers: [])
+                    .help("Press 1. It comes back later in this practice.")
+                Button { practice(gotIt: true) } label: { Text("Got It").frame(maxWidth: .infinity) }
+                    .tint(.green)
+                    .keyboardShortcut(.space, modifiers: [])
+                    .help("Press Space")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+        } else if revealed {
             HStack(spacing: 6) {
                 ForEach(Rating.allCases) { rating in
                     Button { rate(rating) } label: {
@@ -217,10 +242,14 @@ struct StudyView: View {
             Image(systemName: "checkmark.seal")
                 .font(.system(size: 36))
                 .foregroundStyle(.green)
-            Text("All caught up").font(.headline)
+            Text(practicing ? "Practice done" : "All caught up").font(.headline)
             Group {
                 if reviewedThisSession > 0 {
-                    Text("\(reviewedThisSession) reviewed this session.")
+                    Text("\(reviewedThisSession) \(practicing ? "practiced" : "reviewed") this session.")
+                }
+                let today = store.reviewedToday(in: store.studyDecks).count
+                if today > 0 {
+                    Button(practicing ? "Practice again" : "Practice today's \(today) cards again") { startPractice() }
                 }
                 if store.dueCount > 0 {
                     Button("Study \(store.dueCount) more") { rebuildQueue() }
@@ -262,6 +291,20 @@ struct StudyView: View {
         revealed = false
     }
 
+    private func startPractice() {
+        queue = store.reviewedToday(in: store.studyDecks).map(\.id)
+        practicing = true
+        revealed = false
+        reviewedThisSession = 0
+    }
+
+    private func practice(gotIt: Bool) {
+        guard let id = queue.first else { return }
+        queue.removeFirst()
+        if gotIt { reviewedThisSession += 1 } else { queue.append(id) }
+        revealed = false
+    }
+
     private func refillIfEmpty() {
         // Drop cards deleted in the manager while the session was open.
         queue.removeAll { store.card($0) == nil }
@@ -270,6 +313,7 @@ struct StudyView: View {
 
     private func rebuildQueue() {
         queue = store.dueCards(in: store.studyDecks).map(\.id)
+        practicing = false
         revealed = false
         reviewedThisSession = 0
     }

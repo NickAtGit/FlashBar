@@ -146,3 +146,25 @@ struct ReverseTests {
         #expect(merged.cards[0].reverse?.reps == 1)
     }
 }
+
+struct ReviewedTodayTests {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    let calendar = Calendar(identifier: .gregorian)
+
+    @Test func usesLastReviewed() {
+        var card = Card(front: "a", back: "b")
+        #expect(!card.wasReviewed(onDayOf: now, calendar: calendar))
+        card.lastReviewed = now.addingTimeInterval(-60)
+        #expect(card.wasReviewed(onDayOf: now, calendar: calendar))
+        card.lastReviewed = now.addingTimeInterval(-2 * 86_400)
+        #expect(!card.wasReviewed(onDayOf: now, calendar: calendar))
+    }
+
+    @Test func infersTodayForCardsWithoutLastReviewed() {
+        var card = Scheduler.review(Card(front: "a", back: "b"), rating: .good, now: now, calendar: calendar)
+        card = Scheduler.review(card, rating: .good, now: now, calendar: calendar)
+        #expect(card.lastReviewed == nil)
+        #expect(card.wasReviewed(onDayOf: now, calendar: calendar))
+        #expect(!card.wasReviewed(onDayOf: now.addingTimeInterval(86_400), calendar: calendar))
+    }
+}
