@@ -75,11 +75,10 @@ struct StudyView: View {
         VStack(spacing: 14) {
             Text(card.front)
                 .font(.title2.weight(.semibold))
+                .fixedSize(horizontal: false, vertical: true)
             if revealed {
                 Divider()
-                Text(card.back)
-                    .font(.title3)
-                    .foregroundStyle(.primary.opacity(0.85))
+                answer(card.back)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
@@ -95,6 +94,24 @@ struct StudyView: View {
         }
         .contentShape(.rect)
         .onTapGesture { reveal() }
+    }
+
+    /// The meaning, then any example (everything after the first blank line) in a quieter style.
+    private func answer(_ back: String) -> some View {
+        let parts = back.components(separatedBy: "\n\n")
+        let example = parts.dropFirst().joined(separator: "\n\n")
+        return VStack(spacing: 10) {
+            Text(parts[0])
+                .font(.title3)
+                .fixedSize(horizontal: false, vertical: true)
+            if !example.isEmpty {
+                Text(example)
+                    .font(.callout)
+                    .italic()
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     @ViewBuilder

@@ -76,6 +76,7 @@ private struct DeckDetailView: View {
                 TableColumn("Back") { card in
                     if isSynced {
                         Text(card.back.prefix { $0 != "\n" }).foregroundStyle(.secondary)
+                            .help(card.back)
                     } else {
                         TextField("Back", text: field(card.id, \.back))
                     }
