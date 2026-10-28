@@ -54,6 +54,10 @@ struct StudyView: View {
                                                                set: { store.newCardsPerDay = $0 })) {
                     ForEach([0, 10, 20, 30, 50, 100], id: \.self) { Text("\($0)").tag($0) }
                 }
+                Picker("Translations", selection: Binding(get: { store.feedLanguage },
+                                                          set: { store.feedLanguage = $0 })) {
+                    ForEach(FeedLanguage.allCases) { Text($0.title).tag($0) }
+                }
                 Button(store.isSyncing ? "Syncing…" : "Sync Now") { store.sync() }
                     .disabled(store.isSyncing)
                 Divider()

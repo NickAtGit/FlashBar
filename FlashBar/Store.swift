@@ -12,6 +12,13 @@ final class Store {
     var newCardsPerDay = UserDefaults.standard.object(forKey: "newCardsPerDay") as? Int ?? 20 {
         didSet { UserDefaults.standard.set(newCardsPerDay, forKey: "newCardsPerDay") }
     }
+    /// Which translations synced vocab cards show. Changing it rebuilds them from the cached feed.
+    var feedLanguage = FeedLanguage(rawValue: UserDefaults.standard.string(forKey: "feedLanguage") ?? "") ?? .english {
+        didSet {
+            UserDefaults.standard.set(feedLanguage.rawValue, forKey: "feedLanguage")
+            reapplyCachedFeeds()
+        }
+    }
     /// Ticks every 30s so due counts update while the app idles in the menu bar.
     private(set) var now = Date.now
     private(set) var isSyncing = false
@@ -70,12 +77,9 @@ final class Store {
                     if let http = response as? HTTPURLResponse, http.statusCode != 200 {
                         throw URLError(.badServerResponse)
                     }
-                    let cards = try VocabFeed.parse(data)
-                    if let i = decks.firstIndex(where: { $0.id == deckID }) {
-                        var deck = decks[i].merging(cards)
-                        deck.lastSynced = .now
-                        decks[i] = deck
-                    }
+                    try apply(data, to: deckID)
+                    try? data.write(to: cacheURL(for: deckID), options: .atomic)
+                    if let i = decks.firstIndex(where: { $0.id == deckID }) { decks[i].lastSynced = .now }
                 } catch {
                     errors.append(error.localizedDescription)
                 }
@@ -98,6 +102,27 @@ final class Store {
         encoder.dateEncodingStrategy = .iso8601
         guard let data = try? encoder.encode(decks) else { return }
         try? data.write(to: fileURL, options: .atomic)
+    }
+
+    private func apply(_ data: Data, to deckID: UUID) throws {
+        let cards = try VocabFeed.parse(data, language: feedLanguage)
+        if let i = decks.firstIndex(where: { $0.id == deckID }) { decks[i] = decks[i].merging(cards) }
+    }
+
+    private func cacheURL(for deckID: UUID) -> URL {
+        fileURL.deletingLastPathComponent().appending(path: "feed-\(deckID.uuidString).json")
+    }
+
+    private func reapplyCachedFeeds() {
+        var missing = false
+        for deck in decks where deck.isSynced {
+            if let data = try? Data(contentsOf: cacheURL(for: deck.id)) {
+                try? apply(data, to: deck.id)
+            } else {
+                missing = true
+            }
+        }
+        if missing { sync() }
     }
 
     // MARK: Queries

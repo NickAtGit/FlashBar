@@ -152,6 +152,19 @@ enum CardImporter {
     }
 }
 
+enum FeedLanguage: String, CaseIterable, Identifiable {
+    case english, german, both
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .english: "English"
+        case .german: "German"
+        case .both: "English + German"
+        }
+    }
+}
+
 /// Parses the `vocab.json` format of github.com/robin-wonderboy/portuguese-flashcards:
 /// `{ "YYYY-MM-DD": [{ "pt", "en", "de", "example", "example_en", "example_de" }] }`.
 enum VocabFeed {
@@ -166,7 +179,7 @@ enum VocabFeed {
         let example_de: String?
     }
 
-    static func parse(_ data: Data) throws -> [Card] {
+    static func parse(_ data: Data, language: FeedLanguage = .english) throws -> [Card] {
         let days = try JSONDecoder().decode([String: [Entry]].self, from: data)
         let dateFormat = Date.ISO8601FormatStyle().year().month().day()
         var seen = Set<String>()
@@ -175,14 +188,26 @@ enum VocabFeed {
             let created = (try? dateFormat.parse(day)) ?? .distantPast
             return entries.compactMap { e -> Card? in
                 let pt = e.pt.trimmingCharacters(in: .whitespaces)
-                guard !pt.isEmpty, let meaning = e.en ?? e.de, seen.insert(pt).inserted else { return nil }
-                var back = meaning
+                let meanings = pick(e.en, e.de, language)
+                guard !pt.isEmpty, !meanings.isEmpty, seen.insert(pt).inserted else { return nil }
+                var back = meanings.joined(separator: "\n")
                 if let example = e.example, !example.isEmpty {
-                    back += "\n\n" + example
-                    if let translation = e.example_en ?? e.example_de { back += "\n" + translation }
+                    back += "\n\n" + ([example] + pick(e.example_en, e.example_de, language)).joined(separator: "\n")
                 }
                 return Card(front: pt, back: back, created: created, sourceKey: pt)
             }
+        }
+    }
+}
+
+extension VocabFeed {
+    /// The texts to show for `language`, falling back to whichever one exists.
+    private static func pick(_ en: String?, _ de: String?, _ language: FeedLanguage) -> [String] {
+        let en = en.flatMap { $0.isEmpty ? nil : $0 }, de = de.flatMap { $0.isEmpty ? nil : $0 }
+        switch language {
+        case .english: return [en ?? de].compactMap { $0 }
+        case .german: return [de ?? en].compactMap { $0 }
+        case .both: return [en, de].compactMap { $0 }
         }
     }
 }

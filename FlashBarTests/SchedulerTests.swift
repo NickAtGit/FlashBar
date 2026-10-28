@@ -101,3 +101,24 @@ struct SyncTests {
         #expect(decks[0].source == nil)
     }
 }
+
+struct FeedLanguageTests {
+    let json = Data("""
+    {"2026-10-28": [{"pt": "alcançar", "en": "to reach", "de": "erreichen",
+                     "example": "A paciência atingiu o limite",
+                     "example_en": "Patience has reached the limit",
+                     "example_de": "Die Geduld hat die Grenze erreicht"},
+                    {"pt": "só alemão", "de": "nur Deutsch"}]}
+    """.utf8)
+
+    @Test func german() throws {
+        let cards = try VocabFeed.parse(json, language: .german)
+        #expect(cards[0].back == "erreichen\n\nA paciência atingiu o limite\nDie Geduld hat die Grenze erreicht")
+    }
+
+    @Test func both() throws {
+        let cards = try VocabFeed.parse(json, language: .both)
+        #expect(cards[0].back == "to reach\nerreichen\n\nA paciência atingiu o limite\nPatience has reached the limit\nDie Geduld hat die Grenze erreicht")
+        #expect(cards[1].back == "nur Deutsch")
+    }
+}
