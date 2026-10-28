@@ -10,15 +10,65 @@ struct Card: Identifiable, Codable, Hashable {
     var lapses = 0
     var due = Date.distantPast
     var created = Date.now
+    var firstReviewed: Date?
+    /// Stable identity for cards that come from a synced deck, used to keep progress across syncs.
+    var sourceKey: String?
 
     var isNew: Bool { reps == 0 && lapses == 0 }
     func isDue(at date: Date) -> Bool { due <= date }
+}
+
+extension Card {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        front = try c.decode(String.self, forKey: .front)
+        back = try c.decode(String.self, forKey: .back)
+        ease = try c.decodeIfPresent(Double.self, forKey: .ease) ?? 2.5
+        intervalDays = try c.decodeIfPresent(Double.self, forKey: .intervalDays) ?? 0
+        reps = try c.decodeIfPresent(Int.self, forKey: .reps) ?? 0
+        lapses = try c.decodeIfPresent(Int.self, forKey: .lapses) ?? 0
+        due = try c.decodeIfPresent(Date.self, forKey: .due) ?? .distantPast
+        created = try c.decodeIfPresent(Date.self, forKey: .created) ?? .now
+        firstReviewed = try c.decodeIfPresent(Date.self, forKey: .firstReviewed)
+        sourceKey = try c.decodeIfPresent(String.self, forKey: .sourceKey)
+    }
 }
 
 struct Deck: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var cards: [Card] = []
+    /// When set, the deck mirrors this remote file and its cards are read-only.
+    var source: URL?
+    var lastSynced: Date?
+
+    var isSynced: Bool { source != nil }
+
+    /// Replaces the cards with `remote`, carrying over review progress for cards with the same `sourceKey`.
+    func merging(_ remote: [Card]) -> Deck {
+        let existing = Dictionary(cards.compactMap { c in c.sourceKey.map { ($0, c) } }, uniquingKeysWith: { a, _ in a })
+        var deck = self
+        deck.cards = remote.map { incoming in
+            guard let key = incoming.sourceKey, var card = existing[key] else { return incoming }
+            card.front = incoming.front
+            card.back = incoming.back
+            card.created = incoming.created
+            return card
+        }
+        return deck
+    }
+}
+
+extension Deck {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        cards = try c.decodeIfPresent([Card].self, forKey: .cards) ?? []
+        source = try c.decodeIfPresent(URL.self, forKey: .source)
+        lastSynced = try c.decodeIfPresent(Date.self, forKey: .lastSynced)
+    }
 }
 
 enum Rating: Int, CaseIterable, Identifiable {
@@ -99,6 +149,41 @@ enum CardImporter {
 
     static func export(_ deck: Deck) -> String {
         deck.cards.map { "\($0.front)\t\($0.back)" }.joined(separator: "\n")
+    }
+}
+
+/// Parses the `vocab.json` format of github.com/robin-wonderboy/portuguese-flashcards:
+/// `{ "YYYY-MM-DD": [{ "pt", "en", "de", "example", "example_en", "example_de" }] }`.
+enum VocabFeed {
+    static let portugueseURL = URL(string: "https://raw.githubusercontent.com/robin-wonderboy/portuguese-flashcards/main/data/vocab.json")!
+
+    private struct Entry: Decodable {
+        let pt: String
+        let en: String?
+        let de: String?
+        let example: String?
+        let example_en: String?
+        let example_de: String?
+    }
+
+    static func parse(_ data: Data) throws -> [Card] {
+        let days = try JSONDecoder().decode([String: [Entry]].self, from: data)
+        let dateFormat = Date.ISO8601FormatStyle().year().month().day()
+        var seen = Set<String>()
+        // Newest days first, so new-card order follows the feed.
+        return days.sorted { $0.key > $1.key }.flatMap { day, entries in
+            let created = (try? dateFormat.parse(day)) ?? .distantPast
+            return entries.compactMap { e -> Card? in
+                let pt = e.pt.trimmingCharacters(in: .whitespaces)
+                guard !pt.isEmpty, let meaning = e.en ?? e.de, seen.insert(pt).inserted else { return nil }
+                var back = meaning
+                if let example = e.example, !example.isEmpty {
+                    back += "\n\n" + example
+                    if let translation = e.example_en ?? e.example_de { back += "\n" + translation }
+                }
+                return Card(front: pt, back: back, created: created, sourceKey: pt)
+            }
+        }
     }
 }
 

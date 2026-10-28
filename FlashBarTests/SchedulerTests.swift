@@ -63,3 +63,41 @@ struct ImportTests {
         #expect(cards.map(\.back) == ["hello", "goodbye"])
     }
 }
+
+struct SyncTests {
+    @Test func parsesFeedNewestFirstWithExamples() throws {
+        let json = """
+        {"2026-01-01": [{"pt": "velho", "de": "alt"}],
+         "2026-03-11": [{"pt": "regressar", "en": "to return", "de": "zurückkehren",
+                         "example": "A chuva pode regressar.", "example_en": "The rain may return."},
+                        {"pt": "regressar", "en": "duplicate"}, {"pt": "  ", "en": "blank"}]}
+        """
+        let cards = try VocabFeed.parse(Data(json.utf8))
+        #expect(cards.map(\.front) == ["regressar", "velho"])
+        #expect(cards[0].back == "to return\n\nA chuva pode regressar.\nThe rain may return.")
+        #expect(cards[1].back == "alt") // falls back to German
+        #expect(cards[0].sourceKey == "regressar")
+    }
+
+    @Test func mergeKeepsProgressAddsAndRemoves() {
+        var known = Card(front: "a", back: "old", sourceKey: "a")
+        known = Scheduler.review(known, rating: .good)
+        let deck = Deck(name: "d", cards: [known, Card(front: "gone", back: "x", sourceKey: "gone")])
+
+        let merged = deck.merging([Card(front: "a", back: "new", sourceKey: "a"),
+                                   Card(front: "b", back: "b", sourceKey: "b")])
+
+        #expect(merged.cards.map(\.front) == ["a", "b"])
+        #expect(merged.cards[0].id == known.id)
+        #expect(merged.cards[0].reps == 1)
+        #expect(merged.cards[0].back == "new")
+        #expect(merged.cards[1].isNew)
+    }
+
+    @Test func decodesCardsSavedBeforeSyncFields() throws {
+        let json = #"[{"id":"7F0C1E52-5E8B-4C5B-9C7B-1C2D3E4F5A6B","name":"Old","cards":[{"id":"8F0C1E52-5E8B-4C5B-9C7B-1C2D3E4F5A6B","front":"f","back":"b"}]}]"#
+        let decks = try JSONDecoder().decode([Deck].self, from: Data(json.utf8))
+        #expect(decks[0].cards[0].sourceKey == nil)
+        #expect(decks[0].source == nil)
+    }
+}

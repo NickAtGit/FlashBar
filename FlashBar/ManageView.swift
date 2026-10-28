@@ -10,7 +10,7 @@ struct ManageView: View {
             List(selection: $selectedDeckID) {
                 ForEach(store.decks) { deck in
                     HStack {
-                        Text(deck.name)
+                        Label(deck.name, systemImage: deck.isSynced ? "arrow.triangle.2.circlepath" : "rectangle.stack")
                         Spacer()
                         let due = store.dueCards(in: [deck]).count
                         if due > 0 {
@@ -19,6 +19,9 @@ struct ManageView: View {
                     }
                     .tag(deck.id)
                     .contextMenu {
+                        if deck.isSynced {
+                            Button("Sync Now") { store.sync() }
+                        }
                         Button("Delete Deck", role: .destructive) { store.deleteDeck(deck.id) }
                     }
                 }
@@ -56,23 +59,38 @@ private struct DeckDetailView: View {
     @FocusState private var frontFocused: Bool
 
     private var deck: Deck? { store.decks.first { $0.id == deckID } }
+    private var isSynced: Bool { deck?.isSynced ?? false }
 
     var body: some View {
         VStack(spacing: 0) {
-            addForm.padding(12)
+            if let deck, deck.isSynced {
+                syncBar(deck).padding(12)
+            } else {
+                addForm.padding(12)
+            }
             Divider()
             Table(deck?.cards ?? [], selection: $selection) {
-                TableColumn("Front") { card in TextField("Front", text: field(card.id, \.front)) }
-                TableColumn("Back") { card in TextField("Back", text: field(card.id, \.back)) }
+                TableColumn("Front") { card in
+                    if isSynced { Text(card.front) } else { TextField("Front", text: field(card.id, \.front)) }
+                }
+                TableColumn("Back") { card in
+                    if isSynced {
+                        Text(card.back.prefix { $0 != "\n" }).foregroundStyle(.secondary)
+                    } else {
+                        TextField("Back", text: field(card.id, \.back))
+                    }
+                }
                 TableColumn("Due") { card in
                     Text(dueLabel(card)).foregroundStyle(.secondary)
                 }
                 .width(min: 80, ideal: 100, max: 140)
             }
             .contextMenu(forSelectionType: UUID.self) { ids in
-                Button("Delete", role: .destructive) { store.deleteCards(ids, from: deckID) }
+                if !isSynced {
+                    Button("Delete", role: .destructive) { store.deleteCards(ids, from: deckID) }
+                }
             }
-            .onDeleteCommand { store.deleteCards(selection, from: deckID) }
+            .onDeleteCommand { if !isSynced { store.deleteCards(selection, from: deckID) } }
         }
         .navigationTitle(deck?.name ?? "")
         .toolbar {
@@ -80,8 +98,10 @@ private struct DeckDetailView: View {
                 TextField("Deck name", text: deckName).frame(minWidth: 200)
             }
             ToolbarItemGroup {
-                Button("Import…", systemImage: "square.and.arrow.down", action: importCards)
-                    .help("Import a TSV or CSV file, one card per line: front, back")
+                if !isSynced {
+                    Button("Import…", systemImage: "square.and.arrow.down", action: importCards)
+                        .help("Import a TSV or CSV file, one card per line: front, back")
+                }
                 Button("Export…", systemImage: "square.and.arrow.up", action: exportCards)
                 Button("Reset Progress", systemImage: "arrow.counterclockwise") { confirmReset = true }
             }
@@ -103,6 +123,29 @@ private struct DeckDetailView: View {
         }
         .textFieldStyle(.roundedBorder)
         .onSubmit(addCard)
+    }
+
+    private func syncBar(_ deck: Deck) -> some View {
+        HStack {
+            Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(deck.cards.count) cards, kept in sync with \(deck.source?.host() ?? "the web")")
+                Group {
+                    if let error = store.syncError {
+                        Text("Last sync failed: \(error)").foregroundStyle(.red)
+                    } else if let last = deck.lastSynced {
+                        Text("Updated \(last, format: .relative(presentation: .named))")
+                    } else {
+                        Text("Not synced yet")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+            Spacer()
+            if store.isSyncing { ProgressView().controlSize(.small) }
+            Button("Sync Now") { store.sync() }.disabled(store.isSyncing)
+        }
     }
 
     // MARK: Helpers

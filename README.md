@@ -6,6 +6,7 @@ A flashcard app that lives in the macOS menu bar, with spaced repetition (an SM-
 - Space flips a card. 1 to 4 rate it: Again, Hard, Good, Easy.
 - Gear menu → Manage Decks to add, edit, import or export cards.
 - Import format is one card per line, `front<TAB>back` or `front,back`.
+- The "Portuguese (Coimbra News)" deck mirrors [robin-wonderboy/portuguese-flashcards](https://github.com/robin-wonderboy/portuguese-flashcards) `data/vocab.json`, synced on launch and every 3 hours. Progress survives syncs. New cards are capped per day (gear menu).
 - Data lives in `~/Library/Application Support/FlashBar/decks.json`.
 
 ## Build

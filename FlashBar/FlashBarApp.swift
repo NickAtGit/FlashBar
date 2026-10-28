@@ -2,7 +2,10 @@ import SwiftUI
 
 @main
 struct FlashBarApp: App {
-    @State private var store = Store()
+    // Unit tests run inside the app; keep them away from the real decks file.
+    @State private var store = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+        ? Store()
+        : Store(fileURL: .temporaryDirectory.appending(path: "FlashBarTests.json"))
 
     var body: some Scene {
         MenuBarExtra {

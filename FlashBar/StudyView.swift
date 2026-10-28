@@ -50,6 +50,13 @@ struct StudyView: View {
             Menu {
                 Button("Manage Decks…") { openManager() }
                     .keyboardShortcut(",")
+                Picker("New Cards per Day", selection: Binding(get: { store.newCardsPerDay },
+                                                               set: { store.newCardsPerDay = $0 })) {
+                    ForEach([0, 10, 20, 30, 50, 100], id: \.self) { Text("\($0)").tag($0) }
+                }
+                Button(store.isSyncing ? "Syncing…" : "Sync Now") { store.sync() }
+                    .disabled(store.isSyncing)
+                Divider()
                 Toggle("Launch at Login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, on in setLaunchAtLogin(on) }
                 Divider()
@@ -134,6 +141,8 @@ struct StudyView: View {
                 }
                 if store.dueCount > 0 {
                     Button("Study \(store.dueCount) more") { rebuildQueue() }
+                } else if store.newCardsWaitingForTomorrow {
+                    Text("More new cards tomorrow.")
                 } else if let next = store.nextDue {
                     Text("Next card due \(next, format: .relative(presentation: .named)).")
                 } else if store.studyDecks.allSatisfy(\.cards.isEmpty) {
