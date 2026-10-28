@@ -78,6 +78,8 @@ struct StudyView: View {
                 }
                 Toggle("Read Words Aloud Automatically", isOn: Binding(get: { speaker.autoSpeak },
                                                                          set: { speaker.autoSpeak = $0 }))
+                Toggle("Remind Me After an Hour Idle", isOn: Binding(get: { store.remindWhenIdle },
+                                                                     set: { store.remindWhenIdle = $0 }))
                 Toggle("Slow Speech", isOn: Binding(get: { speaker.slow }, set: { speaker.slow = $0 }))
                 Button(store.isSyncing ? "Syncing…" : "Sync Now") { store.sync() }
                     .disabled(store.isSyncing)
@@ -305,6 +307,7 @@ struct StudyView: View {
         queue.removeFirst()
         if gotIt { reviewedThisSession += 1 } else { queue.append(id) }
         revealed = false
+        store.noteStudied()
     }
 
     private func refillIfEmpty() {

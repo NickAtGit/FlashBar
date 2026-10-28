@@ -23,6 +23,16 @@ final class Store {
     var direction = StudyDirection(rawValue: UserDefaults.standard.string(forKey: "studyDirection") ?? "") ?? .forward {
         didSet { UserDefaults.standard.set(direction.rawValue, forKey: "studyDirection") }
     }
+    /// Last time a card was rated or practiced, for the idle reminder.
+    /// Starts at launch time when unknown, so the reminder doesn't fire right away.
+    private(set) var lastStudied = UserDefaults.standard.object(forKey: "lastStudied") as? Date ?? .now {
+        didSet { UserDefaults.standard.set(lastStudied, forKey: "lastStudied") }
+    }
+    /// Colors the menu bar icon after an hour without studying, while there's something to study.
+    var remindWhenIdle = UserDefaults.standard.object(forKey: "remindWhenIdle") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(remindWhenIdle, forKey: "remindWhenIdle") }
+    }
+    static let idleReminderAfter: TimeInterval = 60 * 60
     /// Ticks every 30s so due counts update while the app idles in the menu bar.
     private(set) var now = Date.now
     private(set) var isSyncing = false
@@ -153,6 +163,16 @@ final class Store {
             .sorted { ($0.lastReviewed ?? .distantPast) < ($1.lastReviewed ?? .distantPast) }
     }
 
+    var needsRepetition: Bool {
+        guard remindWhenIdle, now.timeIntervalSince(lastStudied) >= Store.idleReminderAfter else { return false }
+        return dueCount > 0 || !reviewedToday(in: studyDecks).isEmpty
+    }
+
+    func noteStudied() {
+        lastStudied = .now
+        now = .now
+    }
+
     var dueCount: Int { dueCards(in: studyDecks).count }
 
     /// Unseen cards are waiting but today's new-card allowance is used up.
@@ -200,7 +220,7 @@ final class Store {
             updated.reverse = ReviewState(next)
             return updated
         }
-        now = .now
+        noteStudied()
     }
 
     func update(_ cardID: UUID, _ transform: (Card) -> Card) {
