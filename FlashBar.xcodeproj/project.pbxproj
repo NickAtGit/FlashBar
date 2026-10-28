@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1969115F61158C318FBAD158 /* SchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3585EB5C03A085C60FE87A59 /* SchedulerTests.swift */; };
+		2BA5675D7CAC488455B33190 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5972A7B90025A3A584F0F8 /* Speaker.swift */; };
 		371E5FD1519DD72C7AE82A68 /* StudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46277D75CECC1943F3E3550A /* StudyView.swift */; };
 		4755922FA0268E6C1088BC9B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80084E7B7C86825150392A12 /* Models.swift */; };
 		4F609A27A1A0ECA0F1B40936 /* FlashBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576054050171B260B47577AD /* FlashBarApp.swift */; };
@@ -34,6 +35,7 @@
 		80084E7B7C86825150392A12 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		94211BB15A6941B6F44AFB87 /* ManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageView.swift; sourceTree = "<group>"; };
 		AF49DA56DCD85117EBA845AD /* FlashBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlashBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC5972A7B90025A3A584F0F8 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		D417057AF9781FC379BF01D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,6 +56,7 @@
 				D417057AF9781FC379BF01D6 /* Info.plist */,
 				94211BB15A6941B6F44AFB87 /* ManageView.swift */,
 				80084E7B7C86825150392A12 /* Models.swift */,
+				BC5972A7B90025A3A584F0F8 /* Speaker.swift */,
 				4D3EE3BB59176EE739ED30FA /* Store.swift */,
 				46277D75CECC1943F3E3550A /* StudyView.swift */,
 			);
@@ -170,6 +173,7 @@
 				4F609A27A1A0ECA0F1B40936 /* FlashBarApp.swift in Sources */,
 				D70A09A272D34FE18C82F170 /* ManageView.swift in Sources */,
 				4755922FA0268E6C1088BC9B /* Models.swift in Sources */,
+				2BA5675D7CAC488455B33190 /* Speaker.swift in Sources */,
 				BD3EB8CD888BFA7D11A9084C /* Store.swift in Sources */,
 				371E5FD1519DD72C7AE82A68 /* StudyView.swift in Sources */,
 			);

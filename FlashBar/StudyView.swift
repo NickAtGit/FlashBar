@@ -8,6 +8,7 @@ struct StudyView: View {
     @State private var revealed = false
     @State private var reviewedThisSession = 0
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    private var speaker: Speaker { .shared }
 
     private var current: Card? { queue.first.flatMap(store.card) }
 
@@ -25,6 +26,8 @@ struct StudyView: View {
         .frame(width: 360)
         .onAppear(perform: refillIfEmpty)
         .onChange(of: store.studyDeckID) { rebuildQueue() }
+        .onChange(of: queue.first, initial: true) { autoSpeak() }
+        .onDisappear { speaker.stop() }
     }
 
     // MARK: Pieces
@@ -58,6 +61,9 @@ struct StudyView: View {
                                                           set: { store.feedLanguage = $0 })) {
                     ForEach(FeedLanguage.allCases) { Text($0.title).tag($0) }
                 }
+                Toggle("Read Words Aloud Automatically", isOn: Binding(get: { speaker.autoSpeak },
+                                                                         set: { speaker.autoSpeak = $0 }))
+                Toggle("Slow Speech", isOn: Binding(get: { speaker.slow }, set: { speaker.slow = $0 }))
                 Button(store.isSyncing ? "Syncing…" : "Sync Now") { store.sync() }
                     .disabled(store.isSyncing)
                 Divider()
@@ -77,12 +83,17 @@ struct StudyView: View {
 
     private func cardFace(_ card: Card) -> some View {
         VStack(spacing: 14) {
-            Text(card.front)
-                .font(.title2.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(card.front)
+                    .font(.title2.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                speakButton(card.front, language: store.speechLanguage(for: card.id))
+                    .keyboardShortcut("s", modifiers: [])
+                    .help("Listen (S)")
+            }
             if revealed {
                 Divider()
-                answer(card.back)
+                answer(card)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
@@ -101,21 +112,46 @@ struct StudyView: View {
     }
 
     /// The meaning, then any example (everything after the first blank line) in a quieter style.
-    private func answer(_ back: String) -> some View {
-        let parts = back.components(separatedBy: "\n\n")
-        let example = parts.dropFirst().joined(separator: "\n\n")
+    /// In synced vocab the example's first line is Portuguese, so it gets its own listen button.
+    private func answer(_ card: Card) -> some View {
+        let parts = card.back.components(separatedBy: "\n\n")
+        let exampleLines = parts.dropFirst().joined(separator: "\n\n").components(separatedBy: "\n")
+        let spokenExample = store.isSynced(card.id) ? exampleLines.first.flatMap { $0.isEmpty ? nil : $0 } : nil
+        let rest = (spokenExample == nil ? exampleLines : Array(exampleLines.dropFirst())).joined(separator: "\n")
         return VStack(spacing: 10) {
             Text(parts[0])
                 .font(.title3)
                 .fixedSize(horizontal: false, vertical: true)
-            if !example.isEmpty {
-                Text(example)
-                    .font(.callout)
-                    .italic()
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 2) {
+                if let spokenExample {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(spokenExample)
+                            .foregroundStyle(.primary.opacity(0.8))
+                            .fixedSize(horizontal: false, vertical: true)
+                        speakButton(spokenExample, language: store.speechLanguage(for: card.id))
+                            .help("Listen to the example")
+                    }
+                }
+                if !rest.isEmpty {
+                    Text(rest)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            .font(.callout)
+            .italic()
         }
+    }
+
+    private func speakButton(_ text: String, language: String?) -> some View {
+        Button {
+            speaker.toggle(text, language: language)
+        } label: {
+            Image(systemName: speaker.speakingText == text ? "stop.circle.fill" : "speaker.wave.2.fill")
+                .contentTransition(.symbolEffect(.replace))
+                .foregroundStyle(.tint)
+        }
+        .buttonStyle(.borderless)
     }
 
     @ViewBuilder
@@ -180,6 +216,11 @@ struct StudyView: View {
 
     private func reveal() {
         withAnimation(.snappy(duration: 0.2)) { revealed = true }
+    }
+
+    private func autoSpeak() {
+        guard speaker.autoSpeak, let card = current else { return }
+        speaker.speak(card.front, language: store.speechLanguage(for: card.id))
     }
 
     private func rate(_ rating: Rating) {

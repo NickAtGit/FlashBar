@@ -151,6 +151,15 @@ final class Store {
 
     var nextDue: Date? { studyDecks.flatMap(\.cards).map(\.due).filter { $0 > now }.min() }
 
+    /// Synced vocab is European Portuguese; other decks let the speaker guess from the text.
+    func speechLanguage(for cardID: UUID) -> String? {
+        decks.first { $0.cards.contains { $0.id == cardID } }?.isSynced == true ? "pt-PT" : nil
+    }
+
+    func isSynced(_ cardID: UUID) -> Bool {
+        decks.first { $0.cards.contains { $0.id == cardID } }?.isSynced ?? false
+    }
+
     func card(_ id: UUID) -> Card? {
         for deck in decks { if let c = deck.cards.first(where: { $0.id == id }) { return c } }
         return nil
