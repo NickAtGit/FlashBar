@@ -1,0 +1,45 @@
+name: FlashBar
+options:
+  bundleIdPrefix: cool.nfc
+  deploymentTarget:
+    macOS: "14.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: FMXL9R3NPC
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+targets:
+  FlashBar:
+    type: application
+    platform: macOS
+    sources: [FlashBar]
+    info:
+      path: FlashBar/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleDisplayName: FlashBar
+        LSApplicationCategoryType: public.app-category.education
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: cool.nfc.FlashBar
+        GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+  FlashBarTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [FlashBarTests]
+    dependencies:
+      - target: FlashBar
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: cool.nfc.FlashBarTests
+schemes:
+  FlashBar:
+    build:
+      targets:
+        FlashBar: all
+    test:
+      targets: [FlashBarTests]

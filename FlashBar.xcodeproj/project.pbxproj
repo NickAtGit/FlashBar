@@ -1,0 +1,417 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1969115F61158C318FBAD158 /* SchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3585EB5C03A085C60FE87A59 /* SchedulerTests.swift */; };
+		371E5FD1519DD72C7AE82A68 /* StudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46277D75CECC1943F3E3550A /* StudyView.swift */; };
+		4755922FA0268E6C1088BC9B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80084E7B7C86825150392A12 /* Models.swift */; };
+		4F609A27A1A0ECA0F1B40936 /* FlashBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576054050171B260B47577AD /* FlashBarApp.swift */; };
+		BD3EB8CD888BFA7D11A9084C /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3EE3BB59176EE739ED30FA /* Store.swift */; };
+		D70A09A272D34FE18C82F170 /* ManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94211BB15A6941B6F44AFB87 /* ManageView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		25F36A0A69FD182AEED2097F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A85C367EA6E114F3FBBDD983 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FAC75888188431EE3E013D1;
+			remoteInfo = FlashBar;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3585EB5C03A085C60FE87A59 /* SchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerTests.swift; sourceTree = "<group>"; };
+		46277D75CECC1943F3E3550A /* StudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyView.swift; sourceTree = "<group>"; };
+		4D3EE3BB59176EE739ED30FA /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		528E64BB589FB4EF90F71895 /* FlashBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlashBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		576054050171B260B47577AD /* FlashBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashBarApp.swift; sourceTree = "<group>"; };
+		80084E7B7C86825150392A12 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		94211BB15A6941B6F44AFB87 /* ManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageView.swift; sourceTree = "<group>"; };
+		AF49DA56DCD85117EBA845AD /* FlashBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlashBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D417057AF9781FC379BF01D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1CA74C6EBE269FBC9C4A7B40 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF49DA56DCD85117EBA845AD /* FlashBar.app */,
+				528E64BB589FB4EF90F71895 /* FlashBarTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		839A2BF3F062F13E44FD8513 /* FlashBar */ = {
+			isa = PBXGroup;
+			children = (
+				576054050171B260B47577AD /* FlashBarApp.swift */,
+				D417057AF9781FC379BF01D6 /* Info.plist */,
+				94211BB15A6941B6F44AFB87 /* ManageView.swift */,
+				80084E7B7C86825150392A12 /* Models.swift */,
+				4D3EE3BB59176EE739ED30FA /* Store.swift */,
+				46277D75CECC1943F3E3550A /* StudyView.swift */,
+			);
+			path = FlashBar;
+			sourceTree = "<group>";
+		};
+		AE1696B2F4C8B5F0225067F6 /* FlashBarTests */ = {
+			isa = PBXGroup;
+			children = (
+				3585EB5C03A085C60FE87A59 /* SchedulerTests.swift */,
+			);
+			path = FlashBarTests;
+			sourceTree = "<group>";
+		};
+		FA8B9578F9592CF94F6143B1 = {
+			isa = PBXGroup;
+			children = (
+				839A2BF3F062F13E44FD8513 /* FlashBar */,
+				AE1696B2F4C8B5F0225067F6 /* FlashBarTests */,
+				1CA74C6EBE269FBC9C4A7B40 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1FAC75888188431EE3E013D1 /* FlashBar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F52A9861DCE53B618A1B71F9 /* Build configuration list for PBXNativeTarget "FlashBar" */;
+			buildPhases = (
+				5CFA816272371C6E98D2560A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlashBar;
+			packageProductDependencies = (
+			);
+			productName = FlashBar;
+			productReference = AF49DA56DCD85117EBA845AD /* FlashBar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		534A7CB4FA6E0082C6D29E98 /* FlashBarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF7022ACDD818789AC4B2875 /* Build configuration list for PBXNativeTarget "FlashBarTests" */;
+			buildPhases = (
+				19F81FD3125B63970272DECA /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C13468C7ED1C1E2AB6A0A826 /* PBXTargetDependency */,
+			);
+			name = FlashBarTests;
+			packageProductDependencies = (
+			);
+			productName = FlashBarTests;
+			productReference = 528E64BB589FB4EF90F71895 /* FlashBarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A85C367EA6E114F3FBBDD983 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1FAC75888188431EE3E013D1 = {
+						DevelopmentTeam = FMXL9R3NPC;
+						ProvisioningStyle = Manual;
+					};
+					534A7CB4FA6E0082C6D29E98 = {
+						DevelopmentTeam = FMXL9R3NPC;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = A8D55C2A7799044034CDDD1B /* Build configuration list for PBXProject "FlashBar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FA8B9578F9592CF94F6143B1;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1CA74C6EBE269FBC9C4A7B40 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1FAC75888188431EE3E013D1 /* FlashBar */,
+				534A7CB4FA6E0082C6D29E98 /* FlashBarTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		19F81FD3125B63970272DECA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1969115F61158C318FBAD158 /* SchedulerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5CFA816272371C6E98D2560A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F609A27A1A0ECA0F1B40936 /* FlashBarApp.swift in Sources */,
+				D70A09A272D34FE18C82F170 /* ManageView.swift in Sources */,
+				4755922FA0268E6C1088BC9B /* Models.swift in Sources */,
+				BD3EB8CD888BFA7D11A9084C /* Store.swift in Sources */,
+				371E5FD1519DD72C7AE82A68 /* StudyView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C13468C7ED1C1E2AB6A0A826 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FAC75888188431EE3E013D1 /* FlashBar */;
+			targetProxy = 25F36A0A69FD182AEED2097F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		58131B9A0FDAAD46B28EEA97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cool.nfc.FlashBarTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlashBar.app/Contents/MacOS/FlashBar";
+			};
+			name = Debug;
+		};
+		5E384D362D0C068F334A8D48 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cool.nfc.FlashBarTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlashBar.app/Contents/MacOS/FlashBar";
+			};
+			name = Release;
+		};
+		8A4B55892B663C57762C5B08 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FlashBar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cool.nfc.FlashBar;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		9033E5AD587CF826105C8E0B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = FMXL9R3NPC;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		A4BFDA574048246D2EDCD452 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FlashBar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cool.nfc.FlashBar;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DFC146FF3B2FB169278AF003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = FMXL9R3NPC;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A8D55C2A7799044034CDDD1B /* Build configuration list for PBXProject "FlashBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9033E5AD587CF826105C8E0B /* Debug */,
+				DFC146FF3B2FB169278AF003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CF7022ACDD818789AC4B2875 /* Build configuration list for PBXNativeTarget "FlashBarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				58131B9A0FDAAD46B28EEA97 /* Debug */,
+				5E384D362D0C068F334A8D48 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F52A9861DCE53B618A1B71F9 /* Build configuration list for PBXNativeTarget "FlashBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4BFDA574048246D2EDCD452 /* Debug */,
+				8A4B55892B663C57762C5B08 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A85C367EA6E114F3FBBDD983 /* Project object */;
+}
